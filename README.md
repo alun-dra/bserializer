@@ -1,4 +1,3 @@
-
 # bserializer
 
 `bserializer` is a Go package that facilitates serialization and deserialization of structures into maps (`map[string]interface{}`) with support for field filtering. Inspired by Django Rest Framework serializers, it is designed to be lightweight and easy to use.
@@ -8,6 +7,7 @@
 - Serialization of structures into maps (`map[string]interface{}`).
 - Deserialization of maps into structures.
 - Optional filtering of fields on serialization.
+- Customizable validations to ensure data integrity.
 - Easy integration with REST APIs and HTML views.
 
 ---
@@ -17,7 +17,7 @@
 To install `bserializer`, use `go get`:
 
 ```bash
-go get github.com/alun-dra/bserializer@v1.0.0
+go get github.com/alun-dra/bserializer
 ```
 
 ## **Basic Use**
@@ -50,12 +50,10 @@ func main() {
 		Email: "alice.doe@example.com",
 	}
 
-	// Instancia del serializador
 	s := serializer.BaseSerializer{
-		Fields: nil, // Sin filtrar
+		Fields: nil, 
 	}
 
-	// Serialización
 	serializedData, err := s.Serialize(user)
 	if err != nil {
 		fmt.Println("Error durante la serialización:", err)
@@ -92,12 +90,10 @@ func main() {
 		Email: "alice.doe@example.com",
 	}
 
-	// Instancia del serializador
 	s := serializer.BaseSerializer{
-		Fields: []string{"id", "name"}, // Solo incluir "id" y "name"
+		Fields: []string{"id", "name"}, 
 	}
 
-	// Serialización
 	serializedData, err := s.Serialize(user)
 	if err != nil {
 		fmt.Println("Error durante la serialización:", err)
@@ -128,7 +124,6 @@ type User struct {
 }
 
 func main() {
-	// Mapa de datos
 	data := map[string]interface{}{
 		"id":    1,
 		"name":  "Alice Doe",
@@ -138,10 +133,8 @@ func main() {
 	// Instancia del serializador
 	s := serializer.BaseSerializer{}
 
-	// Estructura destino
 	var user User
 
-	// Deserialización
 	err := s.Deserialize(data, &user)
 	if err != nil {
 		fmt.Println("Error durante la deserialización:", err)
@@ -180,15 +173,12 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 		Email: "alice.doe@example.com",
 	}
 
-	// Instancia del serializador
 	s := serializer.BaseSerializer{
 		Fields: []string{"id", "name"},
 	}
 
-	// Serialización
 	serializedData, _ := s.Serialize(user)
 
-	// Enviar como JSON
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(serializedData)
 }
@@ -228,15 +218,12 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 		Email: "alice.doe@example.com",
 	}
 
-	// Instancia del serializador
 	s := serializer.BaseSerializer{
 		Fields: []string{"id", "name"},
 	}
 
-	// Serialización
 	serializedData, _ := s.Serialize(user)
 
-	// Plantilla HTML
 	tmpl := template.Must(template.New("view").Parse(`
 		<!DOCTYPE html>
 		<html>
@@ -258,6 +245,55 @@ func main() {
 }
 ```
 
+## **validation**
+
+1. Validations
+bserializer supports custom field validations to ensure data complies with specific rules. You can define validation rules for each field using validation functions.
+```bash
+package main
+
+import (
+	"fmt"
+	"github.com/alun-dra/bserializer/serializer"
+)
+
+func main() {
+	user := map[string]interface{}{
+		"id":    1,
+		"name":  "", // Empty field to test validation
+		"email": "alice.doe@example.com",
+	}
+
+	// Create the serializer instance with validations
+	s := serializer.BaseSerializer{
+		Fields: []string{"id", "name", "email"},
+		Validations: map[string]func(interface{}) error{
+			"name":  serializer.NotEmpty, // Validate that "name" is not empty
+			"email": serializer.NotEmpty, // Validate that "email" is not empty
+		},
+	}
+
+	// Validate data
+	if err := s.Validate(user); err != nil {
+		fmt.Println("Validation Error:", err)
+		return
+	}
+
+	// Serialize data
+	serializedData, err := s.Serialize(user)
+	if err != nil {
+		fmt.Println("Serialization Error:", err)
+		return
+	}
+
+	fmt.Println("Serialized Data:", serializedData)
+}
+```
+Output: If the "name" field is empty:
+```bash
+Validation Error: validation failed for field 'name': value cannot be empty
+```
+
 
 ## **Contributions**
 
@@ -265,5 +301,3 @@ Contributions are welcome. If you find an issue or have a suggestion, please ope
 
 ## **License**
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more details.
-
-## **validation**
