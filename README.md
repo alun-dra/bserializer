@@ -294,6 +294,166 @@ Output: If the "name" field is empty:
 Validation Error: validation failed for field 'name': value cannot be empty
 ```
 
+
+## **Advanced Validations**
+
+bserializer supports advanced validations, including multiple validations per field and predefined validation functions. This makes it easy to enforce complex rules on your data.
+
+# Built-in Validation Functions
+1. NotEmpty
+Ensures the field is not empty
+```bash
+serializer.NotEmpty
+```
+2. Positive
+Ensures the field is a positive number.
+```bash
+serializer.Positive
+```
+
+3. ValidPassword
+Ensures the password meets the following criteria:
+
+- At least 8 characters long.
+- Contains at least one uppercase letter.
+- Contains at least one lowercase letter.
+- Contains at least one number.
+- Contains at least one special character (e.g., !@#$%^&*()).
+
+```bash
+serializer.ValidPassword
+```
+
+Example: Multiple Validations with Password
+This example demonstrates using multiple validations, including the password validation:
+
+```bash
+package main
+
+import (
+	"fmt"
+	"github.com/alun-dra/bserializer/serializer"
+)
+
+func main() {
+	user := map[string]interface{}{
+		"name":     "Alice Doe",
+		"email":    "alice.doe@example.com",
+		"password": "Short1!", // Invalid password for testing
+	}
+
+	// Create the serializer instance with validations
+	s := serializer.BaseSerializer{
+		Validations: map[string][]func(interface{}) error{
+			"name":     {serializer.NotEmpty},
+			"email":    {serializer.ValidEmail},
+			"password": {serializer.ValidPassword}, // Add password validation
+		},
+	}
+
+	// Validate the data
+	if err := s.Validate(user); err != nil {
+		fmt.Println("Validation Error:", err)
+		return
+	}
+
+	fmt.Println("Validation passed!")
+}
+```
+# Output
+
+1. If the password field is invalid:
+```bash
+Validation Error: validation failed for field 'password': password must be at least 8 characters long
+```
+
+2. If all validations pass:
+```bash
+Validation passed!
+```
+
+# How It Works
+1. Multiple Validations:
+You can define multiple validation functions for a single field by using a slice of validation functions:
+```bash
+Validations: map[string][]func(interface{}) error{
+    "name":     {serializer.NotEmpty},
+    "email":    {serializer.ValidEmail},
+    "password": {serializer.ValidPassword},
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## **Field Transformations**
 
 1. Transforming Fields

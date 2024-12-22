@@ -15,7 +15,7 @@ type Serializer interface {
 // BaseSerializer is the default implementation of Serializer.
 type BaseSerializer struct {
 	Fields          []string                                 // Included fields
-	Validations     map[string]func(interface{}) error       // Validations by field
+	Validations     map[string][]func(interface{}) error     // Multiple validations per field
 	Transformations map[string]func(interface{}) interface{} // Transformations by field
 }
 
@@ -73,10 +73,12 @@ func (s *BaseSerializer) Validate(data map[string]interface{}) error {
 		return nil // No validations defined
 	}
 
-	for field, validation := range s.Validations {
+	for field, validations := range s.Validations {
 		if value, exists := data[field]; exists {
-			if err := validation(value); err != nil {
-				return fmt.Errorf("validation failed for field '%s': %w", field, err)
+			for _, validation := range validations {
+				if err := validation(value); err != nil {
+					return fmt.Errorf("validation failed for field '%s': %w", field, err)
+				}
 			}
 		} else {
 			return fmt.Errorf("field '%s' is missing", field)
