@@ -257,3 +257,11 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 }
 ```
+
+
+## **Contributions**
+
+Contributions are welcome. If you find an issue or have a suggestion, please open an issueor submit an pull requeston GitHub.
+
+## **License**
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more details.
