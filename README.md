@@ -294,6 +294,77 @@ Output: If the "name" field is empty:
 Validation Error: validation failed for field 'name': value cannot be empty
 ```
 
+## **Field Transformations**
+
+1. Transforming Fields
+
+Here’s how to define and use transformations in `BaseSerializer`:
+
+```bash
+package main
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/alun-dra/bserializer/serializer"
+)
+
+type User struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
+func main() {
+	user := User{
+		ID:    1,
+		Name:  "Alice Doe",
+		Email: "alice.doe@example.com",
+	}
+
+	// Create a serializer instance with transformations
+	s := serializer.BaseSerializer{
+		Fields: []string{"id", "name", "email"}, // Optional: Filter only the fields you want
+		Transformations: map[string]func(interface{}) interface{}{
+			"name": func(value interface{}) interface{} {
+				return strings.ToUpper(value.(string)) // Convert name to uppercase
+			},
+			"email": func(value interface{}) interface{} {
+				return strings.ReplaceAll(value.(string), "@example.com", "@mydomain.com") // Change email domain
+			},
+		},
+	}
+
+	// Serialize the data
+	serializedData, err := s.Serialize(user)
+	if err != nil {
+		fmt.Println("Serialization Error:", err)
+		return
+	}
+
+	fmt.Println("Serialized Data with Transformations:", serializedData)
+}
+
+```
+Output
+If executed with the provided user struct, the output will be:
+```bash
+Serialized Data with Transformations: map[id:1 name:ALICE DOE email:alice.doe@mydomain.com]
+```
+
+How It Works
+1. Transformations Field:
+You define the Transformations field as a map where:
+
+-Key: The field name in the struct you want to transform.
+-Value: A function (func(interface{}) interface{}) that takes the field's value and returns the transformed value.
+
+2. Order of Operations:
+-Transformations are applied before field filtering, meaning the modified values will appear in the final serialized map if the field is included.
+
+3. Flexible Application:
+-You can mix transformations with validations and field filtering to fully customize your serialization process.
 
 ## **Contributions**
 
