@@ -17,18 +17,19 @@ type BaseSerializer struct {
 
 // Serialize serializes a struct into a map with optional field filtering.
 func (s *BaseSerializer) Serialize(data interface{}) (map[string]interface{}, error) {
-	result := make(map[string]interface{})
-
+	// Convierte la estructura en JSON
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(jsonData, &result)
-	if err != nil {
+	// Convierte el JSON en un mapa
+	var result map[string]interface{}
+	if err := json.Unmarshal(jsonData, &result); err != nil {
 		return nil, err
 	}
 
+	// Filtrar campos si es necesario
 	if len(s.Fields) > 0 {
 		filtered := make(map[string]interface{})
 		for _, field := range s.Fields {
