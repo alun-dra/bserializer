@@ -2,7 +2,6 @@ package serializer
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 // Serializer interface defines the methods for serialization.
@@ -23,14 +22,12 @@ func (s *BaseSerializer) Serialize(data interface{}) (map[string]interface{}, er
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("JSON Data:", string(jsonData)) // Debugging
 
 	// Convierte el JSON en un mapa
 	var result map[string]interface{}
 	if err := json.Unmarshal(jsonData, &result); err != nil {
 		return nil, err
 	}
-	fmt.Println("Mapa Deserializado:", result) // Debugging
 
 	// Filtrar campos si es necesario
 	if len(s.Fields) > 0 {
@@ -38,9 +35,10 @@ func (s *BaseSerializer) Serialize(data interface{}) (map[string]interface{}, er
 		for _, field := range s.Fields {
 			if value, ok := result[field]; ok {
 				filtered[field] = value
+			} else {
+				filtered[field] = nil // Si el campo no existe, lo pone como nil
 			}
 		}
-		fmt.Println("Campos Filtrados:", filtered) // Debugging
 		return filtered, nil
 	}
 
