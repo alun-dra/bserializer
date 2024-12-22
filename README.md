@@ -17,7 +17,7 @@
 To install `bserializer`, use `go get`:
 
 ```bash
-go get github.com/alun-dra/bserializer
+go get github.com/alun-dra/bserializer@v1.0.0
 ```
 
 ## **Basic Use**
