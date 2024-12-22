@@ -2,7 +2,10 @@ package serializer
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
+
+	"gopkg.in/yaml.v3" // YAML library, install using: go get gopkg.in/yaml.v3
 )
 
 // Serializer interface defines the methods for serialization.
@@ -10,6 +13,8 @@ type Serializer interface {
 	Serialize(interface{}) (map[string]interface{}, error)
 	Deserialize(map[string]interface{}, interface{}) error
 	Validate(map[string]interface{}) error
+	SerializeToXML(interface{}) (string, error)
+	SerializeToYAML(interface{}) (string, error)
 }
 
 // BaseSerializer is the default implementation of Serializer.
@@ -66,6 +71,24 @@ func (s *BaseSerializer) Serialize(data interface{}) (map[string]interface{}, er
 	}
 
 	return result, nil
+}
+
+// SerializeToXML serializes a struct into an XML string.
+func (s *BaseSerializer) SerializeToXML(data interface{}) (string, error) {
+	xmlData, err := xml.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return "", fmt.Errorf("failed to serialize to XML: %w", err)
+	}
+	return string(xmlData), nil
+}
+
+// SerializeToYAML serializes a struct into a YAML string.
+func (s *BaseSerializer) SerializeToYAML(data interface{}) (string, error) {
+	yamlData, err := yaml.Marshal(data)
+	if err != nil {
+		return "", fmt.Errorf("failed to serialize to YAML: %w", err)
+	}
+	return string(yamlData), nil
 }
 
 // Deserialize deserializes a map into a struct.

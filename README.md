@@ -17,7 +17,7 @@
 To install `bserializer`, use `go get`:
 
 ```bash
-go get github.com/alun-dra/bserializer@v1.5.0
+go get github.com/alun-dra/bserializer@v1.6.0
 ```
 
 ## **Basic Use**
@@ -629,6 +629,105 @@ s := serializer.BaseSerializer{
         },
     },
 }
+
+```
+
+
+
+# **Support for Other Formats: XML and YAM**
+
+`bserializer` allows serializing data not only to JSON but also to XML and YAML formats. This feature is useful when working with APIs or systems that require these formats.
+
+## **Serialize to XML**
+
+To serialize a struct to XML, use the `SerializeToXML` method:
+
+
+
+```bash
+xmlOutput, err := serializer.SerializeToXML(data)
+if err != nil {
+    fmt.Println("XML Serialization Error:", err)
+    return
+}
+fmt.Println("Serialized to XML:")
+fmt.Println(xmlOutput)
+```
+
+## **Serialize to YAML**
+To serialize a struct to YAML, use the SerializeToYAML method:
+```bash
+yamlOutput, err := serializer.SerializeToYAML(data)
+if err != nil {
+    fmt.Println("YAML Serialization Error:", err)
+    return
+}
+fmt.Println("Serialized to YAML:")
+fmt.Println(yamlOutput)
+```
+
+## **Example Usage** 
+```bash
+user := User{
+    ID:    1,
+    Name:  "Alice Doe",
+    Email: "alice.doe@example.com",
+    Role:  "admin",
+}
+
+s := serializer.BaseSerializer{}
+
+// Serialize to XML
+xmlOutput, err := s.SerializeToXML(user)
+if err != nil {
+    fmt.Println("XML Serialization Error:", err)
+    return
+}
+fmt.Println("Serialized to XML:")
+fmt.Println(xmlOutput)
+
+// Serialize to YAML
+yamlOutput, err := s.SerializeToYAML(user)
+if err != nil {
+    fmt.Println("YAML Serialization Error:", err)
+    return
+}
+fmt.Println("Serialized to YAML:")
+fmt.Println(yamlOutput)
+
+```
+## **Output**
+
+XML:
+```bash
+<user>
+  <id>1</id>
+  <name>Alice Doe</name>
+  <email>alice.doe@example.com</email>
+  <role>admin</role>
+</user>
+```
+YAML:
+```bash
+id: 1
+name: Alice Doe
+email: alice.doe@example.com
+role: admin
+```
+
+## **How It Works**
+1. XML Serialization:
+
+Uses Go's encoding/xml package to convert structs to XML.
+Automatically applies field tags (xml:"fieldname") for struct fields.
+
+2. YAML Serialization:
+
+Uses the gopkg.in/yaml.v3 package to serialize structs to YAML.
+Requires installing the YAML library
+
+```bash
+go get gopkg.in/yaml.v3
 
 ```
 
