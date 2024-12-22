@@ -17,7 +17,7 @@
 To install `bserializer`, use `go get`:
 
 ```bash
-go get github.com/alun-dra/bserializer
+go get github.com/alun-dra/bserializer@v1.5.0
 ```
 
 ## **Basic Use**
@@ -405,7 +405,7 @@ Combined Rules: Apply multiple rules to a single field:
 "name": {serializer.NotEmpty, serializer.MaxLength(50)}
 ```
 
-## **Field Transformations**
+# **Field Transformations**
 
 1. Transforming Fields
 
@@ -458,7 +458,7 @@ func main() {
 }
 
 ```
-Output
+## **Output**
 If executed with the provided user struct, the output will be:
 ```bash
 Serialized Data with Transformations: map[id:1 name:ALICE DOE email:alice.doe@mydomain.com]
@@ -511,9 +511,130 @@ Adjust values based on business logic.
 ```
 
 
-## **Contributions**
+# **Conditional Fields**
+
+
+bserializer supports conditionally including or excluding fields during serialization based on custom logic. You can define a map of conditions for specific fields, and each condition is a function that evaluates whether a field should be included.
+
+How It Works
+
+1. ConditionalFields Field
+
+You define a ConditionalFields map in the BaseSerializer:
+Key: The field name to evaluate.
+Value: A function (func(map[string]interface{}) bool) that takes the serialized data as input and returns:
+true: The field will be included.
+false: The field will be excluded.
+
+2. Order of Operations:
+
+Conditional field evaluation happens before field filtering (Fields) to ensure only necessary fields are included in the serialized result.
+
+Example: Conditional Inclusion of Fields
+In this example, the email field is included only if the user's role is "admin".
+
+```bash
+package main
+
+import (
+	"fmt"
+	"github.com/alun-dra/bserializer/serializer"
+)
+
+type User struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Role  string `json:"role"`
+}
+
+func main() {
+	user := User{
+		ID:    1,
+		Name:  "Alice Doe",
+		Email: "alice.doe@example.com",
+		Role:  "user", // Change to "admin" to include the email
+	}
+
+	// Create the serializer instance with conditional fields
+	s := serializer.BaseSerializer{
+		ConditionalFields: map[string]func(map[string]interface{}) bool{
+			"email": func(data map[string]interface{}) bool {
+				return data["role"] == "admin" // Include "email" only if role is "admin"
+			},
+		},
+	}
+
+	// Serialize the data
+	serializedData, err := s.Serialize(user)
+	if err != nil {
+		fmt.Println("Serialization Error:", err)
+		return
+	}
+
+	fmt.Println("Serialized Data with Conditional Fields:", serializedData)
+}
+
+```
+
+## **Outpu**
+
+1. If the role is "user" (not admin):
+```bash
+Serialized Data with Conditional Fields: map[id:1 name:Alice Doe role:user]
+```
+
+2. If the role is "admin":
+```bash
+Serialized Data with Conditional Fields: map[id:1 name:Alice Doe email:alice.doe@example.com role:admin]
+```
+
+## **Use Cases**
+
+1. Restricting Data for Certain Roles:
+Include fields only for specific roles, such as admin users.
+
+```bash
+"email": func(data map[string]interface{}) bool {
+    return data["role"] == "admin"
+}
+
+```
+
+2. Dynamic Field Visibility:
+Show sensitive information only if a condition is met.
+```bash
+"ssn": func(data map[string]interface{}) bool {
+    return data["is_verified"] == true
+}
+
+```
+3. Custom Business Logic:
+Exclude fields based on complex logic, such as subscription status.
+```bash
+"subscription_details": func(data map[string]interface{}) bool {
+    return data["subscription_active"] == true
+}
+
+```
+
+Adding Conditional Fields to BaseSerializer
+Define the ConditionalFields map in your BaseSerializer instance:
+
+```bash
+s := serializer.BaseSerializer{
+    ConditionalFields: map[string]func(map[string]interface{}) bool{
+        "email": func(data map[string]interface{}) bool {
+            return data["role"] == "admin" // Only include "email" for admins
+        },
+    },
+}
+
+```
+
+# **Contributions**
 
 Contributions are welcome. If you find an issue or have a suggestion, please open an issueor submit an pull requeston GitHub.
 
-## **License**
+# **License**
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more details.

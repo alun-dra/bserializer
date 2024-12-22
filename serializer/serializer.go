@@ -14,12 +14,13 @@ type Serializer interface {
 
 // BaseSerializer is the default implementation of Serializer.
 type BaseSerializer struct {
-	Fields          []string                                 // Included fields
-	Validations     map[string][]func(interface{}) error     // Multiple validations per field
-	Transformations map[string]func(interface{}) interface{} // Transformations by field
+	Fields            []string                                     // Included fields
+	Validations       map[string][]func(interface{}) error         // Multiple validations per field
+	Transformations   map[string]func(interface{}) interface{}     // Transformations by field
+	ConditionalFields map[string]func(map[string]interface{}) bool // Conditional inclusion of fields
 }
 
-// Serialize serializes a struct into a map with optional field filtering and transformations.
+// Serialize serializes a struct into a map with optional field filtering, transformations, and conditional fields.
 func (s *BaseSerializer) Serialize(data interface{}) (map[string]interface{}, error) {
 	// Convert struct to JSON
 	jsonData, err := json.Marshal(data)
@@ -38,6 +39,15 @@ func (s *BaseSerializer) Serialize(data interface{}) (map[string]interface{}, er
 		for field, transform := range s.Transformations {
 			if value, exists := result[field]; exists {
 				result[field] = transform(value)
+			}
+		}
+	}
+
+	// Apply conditional fields
+	if s.ConditionalFields != nil {
+		for field, condition := range s.ConditionalFields {
+			if include := condition(result); !include {
+				delete(result, field) // Exclude the field if condition is false
 			}
 		}
 	}
