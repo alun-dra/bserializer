@@ -14,11 +14,12 @@ type Serializer interface {
 
 // BaseSerializer is the default implementation of Serializer.
 type BaseSerializer struct {
-	Fields      []string                           // Included fields
-	Validations map[string]func(interface{}) error // Validations by field
+	Fields          []string                                 // Included fields
+	Validations     map[string]func(interface{}) error       // Validations by field
+	Transformations map[string]func(interface{}) interface{} // Transformations by field
 }
 
-// Serialize serializes a struct into a map with optional field filtering.
+// Serialize serializes a struct into a map with optional field filtering and transformations.
 func (s *BaseSerializer) Serialize(data interface{}) (map[string]interface{}, error) {
 	// Convert struct to JSON
 	jsonData, err := json.Marshal(data)
@@ -30,6 +31,15 @@ func (s *BaseSerializer) Serialize(data interface{}) (map[string]interface{}, er
 	var result map[string]interface{}
 	if err := json.Unmarshal(jsonData, &result); err != nil {
 		return nil, err
+	}
+
+	// Apply transformations
+	if s.Transformations != nil {
+		for field, transform := range s.Transformations {
+			if value, exists := result[field]; exists {
+				result[field] = transform(value)
+			}
+		}
 	}
 
 	// Filter fields if necessary
