@@ -357,14 +357,48 @@ How It Works
 1. Transformations Field:
 You define the Transformations field as a map where:
 
--Key: The field name in the struct you want to transform.
--Value: A function (func(interface{}) interface{}) that takes the field's value and returns the transformed value.
+- Key: The field name in the struct you want to transform.
+- Value: A function (func(interface{}) interface{}) that takes the field's value and returns the transformed value.
 
 2. Order of Operations:
--Transformations are applied before field filtering, meaning the modified values will appear in the final serialized map if the field is included.
+- Transformations are applied before field filtering, meaning the modified values will appear in the final serialized map if the field is included.
 
 3. Flexible Application:
--You can mix transformations with validations and field filtering to fully customize your serialization process.
+- You can mix transformations with validations and field filtering to fully customize your serialization process.
+
+
+
+
+Additional Use Cases
+Anonymizing Data:
+Hide sensitive information like emails or phone numbers.
+
+
+```bash
+"email": func(value interface{}) interface{} {
+    return "hidden@example.com" // Replace with anonymized value
+}
+
+```
+Formatting Dates:
+
+Convert timestamps into a human-readable format.
+```bash
+"created_at": func(value interface{}) interface{} {
+    return time.Now().Format("2006-01-02") // Format as YYYY-MM-DD
+}
+```
+Conditional Modifications:
+Adjust values based on business logic.
+```bash
+"status": func(value interface{}) interface{} {
+    if value.(string) == "inactive" {
+        return "archived"
+    }
+    return value
+}
+```
+
 
 ## **Contributions**
 
