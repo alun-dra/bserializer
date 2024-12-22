@@ -4,11 +4,16 @@
 
 ## **Features**
 
-- Serialization of structures into maps (`map[string]interface{}`).
-- Deserialization of maps into structures.
-- Optional filtering of fields on serialization.
-- Customizable validations to ensure data integrity.
-- Easy integration with REST APIs and HTML views.
+- Serialize structs into maps (map[string]interface{}).
+- Deserialize maps into structs.
+- Field filtering and conditional inclusion of fields.
+- Apply field-level transformations.
+- Validate data with multiple rules per field.
+- Advanced error handling with custom error types:
+	- ValidationError
+	- TransformationError
+- SerializationError
+- Support for XML and YAML serialization.
 
 ---
 
@@ -17,7 +22,7 @@
 To install `bserializer`, use `go get`:
 
 ```bash
-go get github.com/alun-dra/bserializer@v1.6.0
+go get github.com/alun-dra/bserializer@v1.8.0
 ```
 
 ## **Basic Use**
