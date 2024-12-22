@@ -383,76 +383,27 @@ Validations: map[string][]func(interface{}) error{
 }
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+2. Custom Validation Functions:
+You can easily add custom validation functions tailored to your specific needs.
+
+3. Comprehensive Error Handling:
+The Validate method returns detailed error messages indicating which field failed validation and why.
+
+# Use Cases
+
+Password Validation: Ensure passwords meet security requirements:
+```bash
+"password": {serializer.ValidPassword}
+```
+
+Email Validation: Validate email format:
+```bash
+"email": {serializer.ValidEmail}
+```
+Combined Rules: Apply multiple rules to a single field:
+```bash
+"name": {serializer.NotEmpty, serializer.MaxLength(50)}
+```
 
 ## **Field Transformations**
 
