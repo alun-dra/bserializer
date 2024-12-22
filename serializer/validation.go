@@ -29,6 +29,18 @@ func Positive(value interface{}) error {
 	return nil
 }
 
+// ValidEmail checks if a string is in a valid email format.
+func ValidEmail(value interface{}) error {
+	str, ok := value.(string)
+	if !ok {
+		return fmt.Errorf("value is not a string")
+	}
+	if !strings.Contains(str, "@") {
+		return fmt.Errorf("invalid email format")
+	}
+	return nil
+}
+
 // ValidPassword checks if a password meets certain criteria.
 func ValidPassword(value interface{}) error {
 	str, ok := value.(string)
